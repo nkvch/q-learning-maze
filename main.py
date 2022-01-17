@@ -15,9 +15,9 @@ actions = {
 
 rewards = {
     '.': -1,
-    '#': -10,
+    '#': -100,
     'S': -1,
-    'F': 10,
+    'F': 100,
 }
 
 
@@ -40,11 +40,6 @@ def get_maze(filename):
 def get_start(maze) -> tuple:
     [x_start], [y_start] = np.where(maze == 'S')
     return x_start, y_start
-
-
-def get_finish(maze) -> tuple:
-    [x_finish], [y_finish] = np.where(maze == 'F')
-    return x_finish, y_finish
 
 
 def get_rewards(maze):
@@ -133,22 +128,26 @@ def train(maze, discount, eps, rate, n_iterations):
 
 
 def main():
-    maze = get_maze('maze1.txt')
-    eps = 0.1
-    discount = 0.9
+    filename = 'maze1.txt'
+    maze = get_maze(filename)
+    maze_x_size, maze_y_size = np.size(maze, 1), np.size(maze, 0)
+    eps = 0.05
+    discount = 0.5
     rate = 0.9
-    n_iterations = 1000
+    n_iterations = 600
 
     qs, n_steps, n_rewards = train(maze, discount, eps, rate, n_iterations)
 
     fig, (top_ax, bottom_ax) = plt.subplots(2)
-    fig.suptitle(f'QL. eps = {eps}, discount = {discount}, l_rate = {rate}, iterations = {n_iterations}')
+    fig.suptitle(
+        f'QL {maze_x_size}X{maze_y_size}. eps = {eps}, discount = {discount}, l_rate = {rate}, iterations = {n_iterations}'
+    )
     top_ax.bar(x=range(n_iterations), height=n_steps)
     top_ax.set_title('Steps made in each train iteration')
     bottom_ax.bar(x=range(n_iterations), height=n_rewards, color='#ff9933')
     bottom_ax.set_title('Total reward in each train iteration')
     fig.tight_layout()
-    plt.savefig(f'figure_eps{eps}_disc{discount}_rate{rate}_iters{n_iterations}.png')
+    plt.savefig(f'./images/figure_{filename}_eps{eps}_disc{discount}_rate{rate}_iters{n_iterations}.png')
 
     str_path, str_maze_with_path = get_str_path(maze, qs)
 
